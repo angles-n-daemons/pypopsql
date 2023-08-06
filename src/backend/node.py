@@ -1,7 +1,8 @@
 from enum import Enum
 from typing import Tuple, List
 
-from util import b2i
+from src.backend.cell import TableLeafCell
+from src.util import b2i
 
 class NodeType(Enum):
     INDEX_INTERIOR = 2
@@ -25,6 +26,7 @@ class Node:
         self.first_freeblock, \
         self.num_fragmented_bytes = self.read_header_bytes(data)
 
+        self.cells = self.read_cells()
 
     def read_header_bytes(
         self,
@@ -63,13 +65,30 @@ class Node:
             num_fragmented_bytes,
         )
 
-    def is_leaf(self, node_type: NodeType = None):
+    def read_cells(self) -> List[any]:
+        page_header_len = 8 if self.is_leaf() else 12
+
+        cells = []
+
+        for i in range(self.num_cells):
+            offset = page_header_len + (i * 2)
+            p = b2i(self.data[offset:offset + 2])
+            cell = TableLeafCell(self.data, p)
+            cells.append(cell)
+
+        return cells
+
+    def is_leaf(self, node_type: NodeType = None) -> bool:
         node_type = node_type or self.node_type
         return node_type in (NodeType.TABLE_LEAF, NodeType.INDEX_LEAF)
 
-    def _debug_print_header(self):
+    def _debug(self):
         print('node type', self.node_type)
         print('first freeblock', self.first_freeblock)
         print('cell content start', self.cell_offset)
         print('num fragmented bytes', self.num_fragmented_bytes)
         print('right pointer', self.right_pointer)
+        print('\n')
+
+        for i, cell in enumerate(self.cells):
+            cell._debug()
