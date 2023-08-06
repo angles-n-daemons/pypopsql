@@ -14,6 +14,7 @@ class Node:
     def __init__(
         self,
         data: bytes,
+        db_header: bool=False,
     ):
 
         self.data = data
@@ -24,13 +25,14 @@ class Node:
         self.num_cells, \
         self.right_pointer, \
         self.first_freeblock, \
-        self.num_fragmented_bytes = self.read_header_bytes(data)
+        self.num_fragmented_bytes = self.read_header_bytes(data, db_header)
 
-        self.cells = self.read_cells()
+        self.cells = self.read_cells(data, db_header)
 
     def read_header_bytes(
         self,
         data: bytes,
+        db_header: bool=False,
     ) -> Tuple[
         NodeType,
         int, # num cells
@@ -39,7 +41,7 @@ class Node:
         int, # first_freeblock
         int, # num_fragmented_bytes
     ]:
-        offset = 0
+        offset = 100 if db_header else 0
 
         node_type = NodeType(b2i(data[offset + 0: offset + 1]))
 
@@ -65,15 +67,20 @@ class Node:
             num_fragmented_bytes,
         )
 
-    def read_cells(self) -> List[any]:
+    def read_cells(
+        self,
+        data: bytes,
+        db_header: bool=False,
+    ) -> List[any]:
         page_header_len = 8 if self.is_leaf() else 12
+        db_header_len = 100 if db_header else 0
 
         cells = []
 
         for i in range(self.num_cells):
-            offset = page_header_len + (i * 2)
-            p = b2i(self.data[offset:offset + 2])
-            cell = TableLeafCell(self.data, p)
+            offset = db_header_len + page_header_len + (i * 2)
+            p = b2i(data[offset:offset + 2])
+            cell = TableLeafCell(data, p)
             cells.append(cell)
 
         return cells
