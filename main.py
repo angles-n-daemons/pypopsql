@@ -2,6 +2,12 @@ from src.dbinfo import DBInfo
 from src.backend.node import Node
 from src.backend.pager import Pager
 
+def test_dbinfo():
+    pager = Pager('test.db')
+    data = pager.get_page(1)
+    dbinfo = DBInfo(data)
+    dbinfo._debug()
+
 def test_btree():
     pager = Pager('test.db')
     data = pager.get_page(2)

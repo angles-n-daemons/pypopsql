@@ -61,9 +61,6 @@ class Column:
             return 13 + (self.length * 2)
 
 
-def make_column(column_type: ColumnType, length: int=None) -> Column:
-    return Column(column_type.value + (length * 2))
-
 class Record:
     def __init__(
         self,
@@ -81,7 +78,7 @@ class Record:
         self,
         data: bytes,
         cursor: int,
-    ):
+    ) -> Tuple[List[Column], int]
         columns = []
         cursor_start = cursor
         num_bytes_header, cursor = varint(data, cursor)
@@ -96,7 +93,7 @@ class Record:
         self,
         data: bytes,
         cursor: int,
-    ):
+    ) -> Tuple[List[any], cursor]:
         values = []
         for column in self.columns:
             value, cursor = self.read_value(column.type, data, cursor, column.length)
