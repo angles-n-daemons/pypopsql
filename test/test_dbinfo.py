@@ -1,4 +1,4 @@
-from dbinfo import DBInfo, FileFormatVersion, SchemaFormat, TextEncoding, Version
+from src.dbinfo import DBInfo, FileFormatVersion, SchemaFormat, TextEncoding, Version
 from unittest import TestCase
 
 EXAMPLE_DBINFO_BYTES = b'SQLite format 3\x00' + bytes([

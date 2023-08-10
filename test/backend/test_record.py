@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Union
 from unittest import TestCase
 
-from record import Record, ColumnType, Column
+from src.backend.record import Record, ColumnType, Column
 
 @dataclass
 class ColumnTestCase:

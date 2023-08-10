@@ -1,8 +1,8 @@
 from unittest import TestCase
 
-from btree import Node
-from pager import Pager
-from record import Column, ColumnType
+from src.backend.node import Node
+from src.backend.pager import Pager
+from src.backend.record import Column, ColumnType
 
 class TestBTree(TestCase):
     def test_table_leaf_parse(self):
@@ -64,28 +64,27 @@ class TestBTree(TestCase):
         p = Pager('./test/test.db')
         data = p.get_page(1)
         node = Node(data, True)
-        node._debug_print_cells()
         self.assertEqual(node.page_size, 4096)
         self.assertEqual(node.num_cells, 1)
-        self.assertEqual(node.cell_offset, 4018)
+        self.assertEqual(node.cell_offset, 4014)
         self.assertEqual(node.first_freeblock, 0)
         self.assertEqual(node.num_fragmented_bytes, 0)
         self.assertEqual(node.right_pointer, None)
         self.assertEqual(len(node.cells), 1)
 
         cell = node.cells[0]
-        self.assertEqual(cell.payload_size, 64)
+        self.assertEqual(cell.payload_size, 68)
         self.assertEqual(cell.row_id, 1)
         self.assertEqual(cell.cursor, 4084)
-        self.assertEquals(cell.record.columns, [
+        self.assertEqual(cell.record.columns, [
             Column(ColumnType.TEXT, 5),
             Column(ColumnType.TEXT, 4),
             Column(ColumnType.TEXT, 4),
             Column(ColumnType.TINYINT),
             Column(ColumnType.TEXT, 44),
         ])
-        self.assertEquals(cell.record.values, ['table', 'test', 'test', 2, 'CREATE TABLE test(col1 varchar(2), col2 int)'])
-        self.assertEquals(cell.record.cursor, 4084)
+        self.assertEqual(cell.record.values, ['table', 'test', 'test', 2, 'CREATE TABLE test(col1 VARCHAR(2), col2 INTEGER)'])
+        self.assertEqual(cell.record.cursor, 4084)
 
 if __name__ == '__main__':
     unittest.main()

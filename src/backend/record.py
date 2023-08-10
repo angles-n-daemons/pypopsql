@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Tuple
+from typing import List, Tuple
 from dataclasses import dataclass
 
 from src.util import b2i, varint
@@ -78,7 +78,7 @@ class Record:
         self,
         data: bytes,
         cursor: int,
-    ) -> Tuple[List[Column], int]
+    ) -> Tuple[List[Column], int]:
         columns = []
         cursor_start = cursor
         num_bytes_header, cursor = varint(data, cursor)
@@ -93,7 +93,7 @@ class Record:
         self,
         data: bytes,
         cursor: int,
-    ) -> Tuple[List[any], cursor]:
+    ) -> Tuple[List[any], int]:
         values = []
         for column in self.columns:
             value, cursor = self.read_value(column.type, data, cursor, column.length)

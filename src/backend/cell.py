@@ -12,8 +12,9 @@ class TableLeafCell:
         self.payload_size, cursor = varint(data, cursor)
         self.row_id, cursor = varint(data, cursor)
 
-        self.payload_data = data[cursor:cursor+self.payload_size]
+        self.payload = data[cursor:cursor+self.payload_size]
         self.record = Record(data, cursor)
+        self.cursor = cursor + self.payload_size
 
     def _debug(self):
         print('cell at index', self.pointer)

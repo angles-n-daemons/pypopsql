@@ -1,13 +1,13 @@
 from unittest import TestCase
 from dataclasses import dataclass
-from util import varint
+from src.util import varint
 
 
 @dataclass
 class VarIntTestCase:
     data: bytes
     expected: int
-    num_bytes: int
+    cursor: int
 
 
 class TestVarint(TestCase):
@@ -22,23 +22,23 @@ class TestVarint(TestCase):
         ]
         for test in tests:
             with self.subTest(msg=f'testing varint {test.data} = {test.expected}'):
-                result, num_bytes = varint(test.data, 0)
+                result, cursor = varint(test.data, 0)
                 self.assertEqual(test.expected, result)
-                self.assertEqual(test.num_bytes, num_bytes)
+                self.assertEqual(test.cursor, cursor)
 
     def test_varint_mid_sequence(self):
-        result, num_bytes = varint([
+        result, cursor = varint([
             0x32, 0x80, 0x7f, 0x91,
         ], 1)
         self.assertEqual(result, 0x0000007f)
-        self.assertEqual(num_bytes, 2)
+        self.assertEqual(cursor, 3)
 
     def test_varint_full_9_bytes(self):
-        result, num_bytes = varint([
+        result, cursor = varint([
             0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81
         ], 0)
         self.assertEqual(result, 145249953336295809)
-        self.assertEqual(num_bytes, 9)
+        self.assertEqual(cursor, 9)
 
 if __name__ == '__main__':
     unittest.main()
