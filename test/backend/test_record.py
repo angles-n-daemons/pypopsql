@@ -62,9 +62,9 @@ class TestRecord(TestCase):
                 self.assertEqual(column.type, test.expected)
                 self.assertEqual(column.length, test.expected_length)
                 self.assertEqual(test.throws_error, False)
+                self.assertEqual(test.value, column.to_int())
             except Exception as e:
                 if not test.throws_error:
-                    import pudb; pudb.set_trace()
                     self.fail(e)
 
     def test_column_int_reading(self):
@@ -225,6 +225,15 @@ class TestRecord(TestCase):
             except Exception as e:
                 if not test.throws_error:
                     self.fail(e)
+
+    def test_record_read_write_payload(self):
+        # 4 byte header
+        # col 1 - tinyint, 17
+        # col 2 - integer, 1114129
+        # col 3 - string, 'OI'
+        payload = bytes.fromhex('0401041111001100114f49')
+        record = Record(payload, 0)
+
 
 if __name__ == '__main__':
     unittest.main()

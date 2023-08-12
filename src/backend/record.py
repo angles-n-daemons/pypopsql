@@ -36,8 +36,15 @@ class Column:
         self.type = column_type
         self.length = length
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'column: {self.type}, {self.length}'
+
+    def to_int(self) -> bytes:
+        if self.type.value < 12:
+            return self.type.value
+
+        modifier = self.type.value
+        return (self.length * 2) + modifier
 
     @classmethod
     def from_int(cls, value: int):
@@ -99,6 +106,9 @@ class Record:
             value, cursor = self.read_value(column.type, data, cursor, column.length)
             values.append(value)
         return values, cursor
+
+    def to_bytes(self) -> bytes:
+        return bytes([])
     
     @staticmethod
     def read_value(

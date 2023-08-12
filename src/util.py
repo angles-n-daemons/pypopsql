@@ -39,3 +39,30 @@ def varint(b: bytes, cursor: int) -> Tuple[int, int]:
 
     return result, cursor + 9
 
+def to_varint(x: int) -> bytes:
+    """
+    to_varint takes an integer and turns it into a variable length byte array
+
+    it takes x, an integer
+
+    and returns a varint representation as a byte array
+    """
+    result = bytearray()
+
+    first_7_bits = 0xfe00000000000000
+    requires_9_bytes = x & first_7_bits
+
+    # if any of the first 7 bits are filled, 9 bytes will be needed
+    first_shift_size = 8 if requires_9_bytes else 7
+    first_modulo = 256 if requires_9_bytes else 128
+
+    result.append(x % first_modulo)
+    x = x >> first_shift_size
+
+    while x > 0:
+        # pull first 7 bits, flip the first bit to signal carryover
+        byte = (x % 128) | 0x80
+        result.insert(0, byte)
+        x = x >> 7
+
+    return bytes(result)
