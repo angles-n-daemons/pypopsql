@@ -1,5 +1,5 @@
 from src.backend.record import Record
-from src.util import varint
+from src.util import to_varint, varint
 
 class TableLeafCell:
     def __init__(
@@ -15,6 +15,12 @@ class TableLeafCell:
         self.payload = data[cursor:cursor+self.payload_size]
         self.record = Record(data, cursor)
         self.cursor = cursor + self.payload_size
+
+    def to_bytes(self):
+        payload = self.record.to_bytes()
+        payload_size_bytes = to_varint(len(payload))
+        row_id_bytes = to_varint(self.row_id)
+        return payload_size_bytes + row_id_bytes + payload
 
     def _debug(self):
         print('cell at index', self.pointer)

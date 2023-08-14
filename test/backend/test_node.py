@@ -4,7 +4,7 @@ from src.backend.node import Node
 from src.backend.pager import Pager
 from src.backend.record import Column, ColumnType
 
-class TestBTree(TestCase):
+class TestNode(TestCase):
     def test_table_leaf_parse(self):
         data = bytes([
             0x0d, # Node Type 13
