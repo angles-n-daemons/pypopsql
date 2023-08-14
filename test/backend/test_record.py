@@ -222,6 +222,9 @@ class TestRecord(TestCase):
                 )
                 self.assertEqual(value, test.expected)
                 self.assertEqual(cursor, test.expected_cursor_end)
+                value_bytes = Record.value_bytes(test.column, value)
+                expected_value_bytes = test.data[test.cursor_start: test.expected_cursor_end]
+                self.assertEqual(value_bytes, expected_value_bytes)
             except Exception as e:
                 if not test.throws_error:
                     self.fail(e)
@@ -233,7 +236,7 @@ class TestRecord(TestCase):
         # col 3 - string, 'OI'
         payload = bytes.fromhex('0401041111001100114f49')
         record = Record(payload, 0)
-
+        self.assertEqual(record.to_bytes(), payload)
 
 if __name__ == '__main__':
     unittest.main()

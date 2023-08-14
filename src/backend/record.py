@@ -2,7 +2,7 @@ from enum import Enum
 from typing import List, Tuple
 from dataclasses import dataclass
 
-from src.util import b2i, varint
+from src.util import b2i, to_varint, varint
 
 class ColumnType(Enum):
     UNKNOWN = -1
@@ -39,12 +39,15 @@ class Column:
     def __repr__(self) -> str:
         return f'column: {self.type}, {self.length}'
 
-    def to_int(self) -> bytes:
+    def to_int(self) -> int:
         if self.type.value < 12:
             return self.type.value
 
         modifier = self.type.value
         return (self.length * 2) + modifier
+
+    def to_bytes(self) -> bytes:
+        return to_varint(self.to_int())
 
     @classmethod
     def from_int(cls, value: int):
@@ -107,9 +110,6 @@ class Record:
             values.append(value)
         return values, cursor
 
-    def to_bytes(self) -> bytes:
-        return bytes([])
-    
     @staticmethod
     def read_value(
         column_type: ColumnType,
@@ -141,6 +141,61 @@ class Record:
             return data[cursor: cursor + length].decode('utf-8'), cursor + length
         else:
             raise Exception(f'cannot parse column type {column_type}')
+
+    def header_bytes(self) -> bytes:
+        payload = bytearray()
+
+        for column in self.columns:
+            payload += column.to_bytes()
+
+        payload_size = len(payload)
+        if payload_size > 32765:
+            raise Exception(f'unexpected header payload size {payload_size}')
+
+        expected_varint_length = 1 if payload_size < 128 else 2
+        header_size_bytes = to_varint(payload_size + expected_varint_length)
+        return bytes(header_size_bytes + payload)
+
+    @staticmethod
+    def value_bytes(column: Column, value: any) -> bytes:
+        if column.type == ColumnType.NULL:
+            return bytes([])
+        elif column.type == ColumnType.TINYINT:
+            return value.to_bytes(1)
+        elif column.type == ColumnType.SMALLINT:
+            return value.to_bytes(2)
+        elif column.type == ColumnType.SMALLISHINT:
+            return value.to_bytes(3)
+        elif column.type == ColumnType.INTEGER:
+            return value.to_bytes(4)
+        elif column.type == ColumnType.BIGGISHINT:
+            return value.to_bytes(6)
+        elif column.type == ColumnType.LONG:
+            return value.to_bytes(8)
+        elif column.type == ColumnType.ZERO:
+            return bytes([])
+        elif column.type == ColumnType.ONE:
+            return bytes([])
+        elif column.type == ColumnType.BLOB:
+            return value
+        elif column.type == ColumnType.TEXT:
+            return bytes(value, 'utf-8')
+        else:
+            raise Exception(f'cannot parse column type {column_type}')
+
+    def values_bytes(self) -> bytes:
+        body = bytearray()
+
+        for i, column in enumerate(self.columns):
+            body += self.value_bytes(column, self.values[i])
+
+        return bytes(body)
+
+    def to_bytes(self) -> bytes:
+        header_bytes = self.header_bytes()
+        values_bytes = self.values_bytes()
+
+        return header_bytes + values_bytes
 
     def _debug(self):
         for i, column in enumerate(self.columns):
