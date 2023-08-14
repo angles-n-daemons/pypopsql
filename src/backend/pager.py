@@ -15,6 +15,15 @@ class Pager:
             file.seek(self.get_offset(page_number))
             return file.read(self.page_size)
 
+    def write_page(
+        self,
+        page_number: int,
+        data: bytes,
+    ):
+        with open(self.file_name, 'rb+') as file:
+            file.seek(self.get_offset(page_number))
+            file.write(data)
+
     def get_offset(
         self,
         page_number: int,

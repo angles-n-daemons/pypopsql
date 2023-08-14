@@ -2,6 +2,7 @@ from enum import Enum
 from typing import Tuple, List
 
 from src.backend.cell import TableLeafCell
+from src.dbinfo import DBInfo
 from src.util import b2i
 
 class NodeType(Enum):
@@ -88,6 +89,9 @@ class Node:
     def is_leaf(self, node_type: NodeType = None) -> bool:
         node_type = node_type or self.node_type
         return node_type in (NodeType.TABLE_LEAF, NodeType.INDEX_LEAF)
+
+    def to_bytes(self, dbinfo: DBInfo) -> bytes:
+        return bytes([])
 
     def _debug(self):
         print('node type', self.node_type)

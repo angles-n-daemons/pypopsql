@@ -67,6 +67,9 @@ class DBInfo:
         patch = vb % 1000
         self.version = Version(major, minor, patch)
 
+    def to_bytes(self) -> bytes:
+        return bytes([])
+
     def _debug(self):
         print('page size', self.page_size)
         print('file format write version', self.file_format_write_version)

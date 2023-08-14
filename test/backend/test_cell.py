@@ -10,11 +10,11 @@ class TestCell(TestCase):
             0x03, 0x11, 0x01, 0x79, 0x6f, 0x02, # payload
         ])
         cell = TableLeafCell(data, 0)
-        self.assertEquals(cell.payload_size, 6)
-        self.assertEquals(cell.row_id, 2)
-        self.assertEquals(cell.payload, data[2:])
-        self.assertEquals(cell.cursor, 8)
-        self.assertEquals(cell.to_bytes(), data)
+        self.assertEqual(cell.payload_size, 6)
+        self.assertEqual(cell.row_id, 2)
+        self.assertEqual(cell.payload, data[2:])
+        self.assertEqual(cell.cursor, 8)
+        self.assertEqual(cell.to_bytes(), data)
 
 if __name__ == '__main__':
     unittest.main()
