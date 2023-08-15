@@ -57,7 +57,7 @@ class TestNode(TestCase):
 
         header_bytes = data[:8]
         self.assertEqual(header_bytes, node.header_bytes(17))
-        self.assertEqual(data.hex(), node.to_bytes(None).hex())
+        self.assertEqual(data, node.to_bytes(None))
 
     def test_schema_header_page(self):
         # test using example database written by sqlite
