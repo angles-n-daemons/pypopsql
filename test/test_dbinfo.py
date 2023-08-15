@@ -92,5 +92,10 @@ class TestDBInfo(TestCase):
         self.assertEqual(dbinfo.version_valid_for, 2)
         self.assertEqual(dbinfo.version, Version(3, 39, 5))
 
+    def test_dbinfo_to_bytes(self):
+        dbinfo = DBInfo(EXAMPLE_DBINFO_BYTES)
+        # test first hundred bytes
+        self.assertEqual(EXAMPLE_DBINFO_BYTES[:100], dbinfo.to_bytes())
+
 if __name__ == '__main__':
     unittest.main()
