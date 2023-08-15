@@ -3,6 +3,8 @@ from enum import Enum
 
 from src.util import b2i
 
+DB_HEADER_PREFIX = b'SQLite format 3\x00'
+
 class FileFormatVersion(Enum):
     LEGACY = 1
     WAL = 2
@@ -46,7 +48,7 @@ class DBInfo:
         data: bytes,
     ):
         header_str = data[:16]
-        if header_str != b'SQLite format 3\x00':
+        if header_str != DB_HEADER_PREFIX:
             raise Exception('header string not found, result is ', header_str)
 
         self.page_size = b2i(data[16:18])
@@ -80,7 +82,7 @@ class DBInfo:
         self.version = Version.from_bytes(data[96:100])
 
     def to_bytes(self) -> bytes:
-        data = b'SQLite format 3\x00'
+        data = DB_HEADER_PREFIX
 
         data += self.page_size.to_bytes(2)
 
