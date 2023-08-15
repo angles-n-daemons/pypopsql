@@ -67,6 +67,11 @@ EXAMPLE_DBINFO_BYTES = b'SQLite format 3\x00' + bytes([
     0x04, 0x05, 0x06, 0x07,
 ])
 
+def get_simple_dbinfo() -> DBInfo:
+    dbinfo = DBInfo(EXAMPLE_DBINFO_BYTES)
+    dbinfo.page_end_reserved_space = 0
+    return dbinfo
+
 class TestDBInfo(TestCase):
     def test_dbinfo_parse(self):
         dbinfo = DBInfo(EXAMPLE_DBINFO_BYTES)

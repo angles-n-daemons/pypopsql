@@ -104,7 +104,7 @@ class Node:
                cell_offset_bytes + \
                num_fragmented_bytes
 
-    def cells_bytes(self) -> Tuple[
+    def cells_bytes(self, reserved_bytes=0) -> Tuple[
         bytes, # cell pointer bytes
         bytes, # cell content bytes
         int, # cell content start pointer
@@ -112,7 +112,7 @@ class Node:
         cell_pointer_bytes = bytes([])
         cell_content_bytes = bytes([])
 
-        pointer = self.page_size
+        pointer = self.page_size - reserved_bytes
         for cell in self.cells:
             content_bytes = cell.to_bytes()
             pointer = pointer - len(content_bytes)
@@ -121,12 +121,14 @@ class Node:
             cell_pointer_bytes += pointer_bytes
             cell_content_bytes = content_bytes + cell_content_bytes # content grows leftward
 
+        cell_content_bytes += bytes([0x00] * reserved_bytes)
+
         return (cell_pointer_bytes, cell_content_bytes, pointer)
 
     def to_bytes(self, dbinfo: DBInfo) -> bytes:
         db_header_len = 100 if self.has_db_header else 0
 
-        cell_pointer_bytes, cell_content_bytes, cell_content_start = self.cells_bytes()
+        cell_pointer_bytes, cell_content_bytes, cell_content_start = self.cells_bytes(dbinfo.page_end_reserved_space)
         header_bytes = self.header_bytes(cell_content_start)
 
         total_content_len = db_header_len + len(header_bytes) + len(cell_pointer_bytes) + len(cell_content_bytes)
@@ -136,7 +138,7 @@ class Node:
             raise ValueError(f'node page overflows by {abs(num_null_bytes)} bytes')
 
         null_bytes = bytes([0x00] * num_null_bytes)
-        
+
         return header_bytes + cell_pointer_bytes + null_bytes + cell_content_bytes
 
     def _debug(self):
