@@ -55,6 +55,10 @@ class TestNode(TestCase):
         self.assertEqual(node.cells[1].payload, bytes([0x03, 0x11, 0x01, 0x79, 0x6f, 0x02]))
         self.assertEqual(node.cells[1].cursor, 25)
 
+        header_bytes = data[:8]
+        self.assertEqual(header_bytes, node.header_bytes(17))
+        self.assertEqual(data.hex(), node.to_bytes(None).hex())
+
     def test_schema_header_page(self):
         # test using example database written by sqlite
         # to recreate use the following commands
@@ -85,6 +89,9 @@ class TestNode(TestCase):
         ])
         self.assertEqual(cell.record.values, ['table', 'test', 'test', 2, 'CREATE TABLE test(col1 VARCHAR(2), col2 INTEGER)'])
         self.assertEqual(cell.record.cursor, 4084)
+
+    def test_to_bytes_overflow_error(self):
+        pass # assert 1 == 2
 
 if __name__ == '__main__':
     unittest.main()

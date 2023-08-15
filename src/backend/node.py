@@ -27,6 +27,7 @@ class Node:
         self.right_pointer, \
         self.first_freeblock, \
         self.num_fragmented_bytes = self.read_header_bytes(data, db_header)
+        self.has_db_header = db_header
 
         self.cells = self.read_cells(data, db_header)
 
@@ -90,8 +91,53 @@ class Node:
         node_type = node_type or self.node_type
         return node_type in (NodeType.TABLE_LEAF, NodeType.INDEX_LEAF)
 
+    def header_bytes(self, cell_offset: int=0) -> bytes:
+        node_type_bytes = self.node_type.value.to_bytes(1)
+        first_freeblock_bytes = (0).to_bytes(2)
+        num_cells_bytes = len(self.cells).to_bytes(2)
+        cell_offset_bytes = cell_offset.to_bytes(2)
+        num_fragmented_bytes = (0).to_bytes(1)
+
+        return node_type_bytes + \
+               first_freeblock_bytes + \
+               num_cells_bytes + \
+               cell_offset_bytes + \
+               num_fragmented_bytes
+
+    def cells_bytes(self) -> Tuple[
+        bytes, # cell pointer bytes
+        bytes, # cell content bytes
+        int, # cell content start pointer
+    ]:
+        cell_pointer_bytes = bytes([])
+        cell_content_bytes = bytes([])
+
+        pointer = self.page_size
+        for cell in self.cells:
+            content_bytes = cell.to_bytes()
+            pointer = pointer - len(content_bytes)
+            pointer_bytes = pointer.to_bytes(2)
+
+            cell_pointer_bytes += pointer_bytes
+            cell_content_bytes = content_bytes + cell_content_bytes # content grows leftward
+
+        return (cell_pointer_bytes, cell_content_bytes, pointer)
+
     def to_bytes(self, dbinfo: DBInfo) -> bytes:
-        return bytes([])
+        db_header_len = 100 if self.has_db_header else 0
+
+        cell_pointer_bytes, cell_content_bytes, cell_content_start = self.cells_bytes()
+        header_bytes = self.header_bytes(cell_content_start)
+
+        total_content_len = db_header_len + len(header_bytes) + len(cell_pointer_bytes) + len(cell_content_bytes)
+        num_null_bytes = self.page_size - total_content_len
+
+        if num_null_bytes < 0:
+            raise ValueError(f'node page overflows by {abs(num_null_bytes)} bytes')
+
+        null_bytes = bytes([0x00] * num_null_bytes)
+        
+        return header_bytes + cell_pointer_bytes + null_bytes + cell_content_bytes
 
     def _debug(self):
         print('node type', self.node_type)
