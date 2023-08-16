@@ -1,3 +1,5 @@
+import os
+
 class Pager:
     def __init__(
         self,
@@ -20,6 +22,10 @@ class Pager:
         page_number: int,
         data: bytes,
     ):
+        # create the file if it doesn't exist
+        if not os.path.exists(file_name):
+            with open(file_name, 'w'): pass
+
         with open(self.file_name, 'rb+') as file:
             file.seek(self.get_offset(page_number))
             file.write(data)
