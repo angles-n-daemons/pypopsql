@@ -119,7 +119,8 @@ class Node:
             pointer_bytes = pointer.to_bytes(2)
 
             cell_pointer_bytes += pointer_bytes
-            cell_content_bytes = content_bytes + cell_content_bytes # content grows leftward
+            # cell content grows leftward
+            cell_content_bytes = content_bytes + cell_content_bytes
 
         cell_content_bytes += bytes([0x00] * reserved_bytes)
 

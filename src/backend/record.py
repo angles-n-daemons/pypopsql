@@ -152,7 +152,7 @@ class Record:
         if payload_size > 32765:
             raise Exception(f'unexpected header payload size {payload_size}')
 
-        expected_varint_length = 1 if payload_size < 128 else 2
+        expected_varint_length = 1 if payload_size < 127 else 2
         header_size_bytes = to_varint(payload_size + expected_varint_length)
         return bytes(header_size_bytes + payload)
 

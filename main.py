@@ -46,5 +46,7 @@ def test_file_end_to_end():
     new_db_pager.write_page(1, new_schema_page)
     new_db_pager.write_page(2, new_data_page)
 
+    print('generated.db written')
+
 if __name__ == '__main__':
     test_file_end_to_end()
