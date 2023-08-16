@@ -2,3 +2,6 @@
 *.swp
 
 *pycache*
+
+# ignore any generated database
+generated.db
