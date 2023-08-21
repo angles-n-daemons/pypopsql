@@ -1,13 +1,16 @@
-name: learn-github-actions
-run-name: ${{ github.actor }} is learning Github Actions
-on: [push]
+name: pypopsql-test-and-lint
+on:
+  push:
+    branches:
+      - main
 jobs:
   check-bats-version:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-python@v4
         with:
-          node-version: '14'
-      - run: npm install -g bats
-      - run: bats -v
+          python-version: '3.11'
+      - run: pip3 install ruff
+      - run: python3 -m unittest discover
+      - run: ruff .
