@@ -24,7 +24,8 @@ class Pager:
     ):
         # create the file if it doesn't exist
         if not os.path.exists(self.file_name):
-            with open(self.file_name, 'w'): pass
+            with open(self.file_name, 'w'):
+                pass
 
         with open(self.file_name, 'rb+') as file:
             file.seek(self.get_offset(page_number))

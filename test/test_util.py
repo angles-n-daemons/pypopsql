@@ -1,3 +1,4 @@
+import unittest
 from unittest import TestCase
 from dataclasses import dataclass
 from src.util import varint, to_varint

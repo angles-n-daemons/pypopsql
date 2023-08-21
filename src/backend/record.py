@@ -62,15 +62,6 @@ class Column:
 
         return cls(column_type, length)
 
-    def to_int(self) -> int:
-        if self.type.value < 12:
-            return self.type.value
-        elif self.type == ColumnType.BLOB:
-            return 12 + (self.length * 2)
-        elif self.type == ColumnType.TEXT:
-            return 13 + (self.length * 2)
-
-
 class Record:
     def __init__(
         self,
@@ -181,7 +172,7 @@ class Record:
         elif column.type == ColumnType.TEXT:
             return bytes(value, 'utf-8')
         else:
-            raise Exception(f'cannot parse column type {column_type}')
+            raise Exception(f'cannot parse column type { column.type }')
 
     def values_bytes(self) -> bytes:
         body = bytearray()

@@ -1,5 +1,7 @@
-from src.dbinfo import DBInfo, FileFormatVersion, SchemaFormat, TextEncoding, Version
+import unittest
 from unittest import TestCase
+
+from src.dbinfo import DBInfo, FileFormatVersion, SchemaFormat, TextEncoding, Version
 
 EXAMPLE_DBINFO_BYTES = b'SQLite format 3\x00' + bytes([
     # page size
@@ -38,7 +40,8 @@ EXAMPLE_DBINFO_BYTES = b'SQLite format 3\x00' + bytes([
 
     # default page cache size
     0x00, 0x00, 0x00, 0x10,
-    # page number of the largest root b-tree page if in auto-vacuum or incremental vacuum mode
+    # page number of the largest root b-tree page if in auto-vacuum or
+    # incremental vacuum mode
     0x00, 0x00, 0x00, 0x00,
     # text encoding
     0x00, 0x00, 0x00, 0x01,

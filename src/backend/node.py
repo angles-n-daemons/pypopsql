@@ -129,10 +129,14 @@ class Node:
     def to_bytes(self, dbinfo: DBInfo) -> bytes:
         db_header_len = 100 if self.has_db_header else 0
 
-        cell_pointer_bytes, cell_content_bytes, cell_content_start = self.cells_bytes(dbinfo.page_end_reserved_space)
+        cell_pointer_bytes, cell_content_bytes, cell_content_start = \
+                self.cells_bytes(dbinfo.page_end_reserved_space)
+
         header_bytes = self.header_bytes(cell_content_start)
 
-        total_content_len = db_header_len + len(header_bytes) + len(cell_pointer_bytes) + len(cell_content_bytes)
+        total_content_len = db_header_len + len(header_bytes) + \
+                len(cell_pointer_bytes) + len(cell_content_bytes)
+
         num_null_bytes = self.page_size - total_content_len
 
         if num_null_bytes < 0:

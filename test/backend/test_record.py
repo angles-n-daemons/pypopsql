@@ -1,3 +1,4 @@
+import unittest
 from dataclasses import dataclass
 from typing import Union
 from unittest import TestCase
@@ -186,7 +187,9 @@ class TestRecord(TestCase):
             # read string example
             ReadValueTestCase(
                 Column.from_int(107),
-                bytes([0x12, 0x34, 0x56]) + bytes('it was the faintest 小战俘 one had ever seen', 'utf-8') + bytes([0x11]),
+                bytes([0x12, 0x34, 0x56]) + \
+                    bytes('it was the faintest 小战俘 one had ever seen', 'utf-8') + \
+                    bytes([0x11]),
                 3,
                 'it was the faintest 小战俘 one had ever seen',
                 50,
@@ -223,7 +226,7 @@ class TestRecord(TestCase):
                 self.assertEqual(value, test.expected)
                 self.assertEqual(cursor, test.expected_cursor_end)
                 value_bytes = Record.value_bytes(test.column, value)
-                expected_value_bytes = test.data[test.cursor_start: test.expected_cursor_end]
+                expected_value_bytes = test.data[test.cursor_start: test.expected_cursor_end] # noqa: E501
                 self.assertEqual(value_bytes, expected_value_bytes)
             except Exception as e:
                 if not test.throws_error:

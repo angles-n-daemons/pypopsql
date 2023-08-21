@@ -1,3 +1,4 @@
+import unittest
 from unittest import TestCase
 
 from src.backend.node import Node
@@ -54,7 +55,10 @@ class TestNode(TestCase):
         # check second row
         self.assertEqual(node.cells[1].payload_size, 6)
         self.assertEqual(node.cells[1].row_id, 2)
-        self.assertEqual(node.cells[1].payload, bytes([0x03, 0x11, 0x01, 0x79, 0x6f, 0x02]))
+        self.assertEqual(
+            node.cells[1].payload,
+            bytes([0x03, 0x11, 0x01, 0x79, 0x6f, 0x02]),
+        )
         self.assertEqual(node.cells[1].cursor, 25)
 
         header_bytes = SIMPLE_TABLE_LEAF_PAGE[:8]
@@ -90,7 +94,16 @@ class TestNode(TestCase):
             Column(ColumnType.TINYINT),
             Column(ColumnType.TEXT, 44),
         ])
-        self.assertEqual(cell.record.values, ['table', 'test', 'test', 2, 'CREATE TABLE test(col1 VARCHAR(2), col2 INTEGER)'])
+        self.assertEqual(
+            cell.record.values,
+            [
+                'table',
+                'test',
+                'test',
+                2,
+                'CREATE TABLE test(col1 VARCHAR(2), col2 INTEGER)',
+            ],
+        )
         self.assertEqual(cell.record.cursor, 4084)
         serialized_page = dbinfo.to_bytes() + node.to_bytes(dbinfo)
         self.assertEqual(data, serialized_page)

@@ -124,8 +124,14 @@ class DBInfo:
         print('file format write version', self.file_format_write_version)
         print('file format read version', self.file_format_read_version)
         print('page reserved space', self.page_end_reserved_space)
-        print('maximum embedded payload fraction', self.maximum_embedded_payload_fraction)
-        print('minimum embedded payload fraction', self.minimum_embedded_payload_fraction)
+        print(
+            'maximum embedded payload fraction',
+            self.maximum_embedded_payload_fraction,
+        )
+        print(
+            'minimum embedded payload fraction',
+            self.minimum_embedded_payload_fraction,
+        )
         print('leaf payload fraction', self.leaf_payload_fraction)
         print('file change counter', self.file_change_counter)
         print('database size in pages', self.db_size_in_pages)
