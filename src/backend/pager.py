@@ -36,3 +36,29 @@ class Pager:
         page_number: int,
     ):
         return (page_number - 1) * self.page_size
+
+class MemoryPager:
+    def __init__(
+        self,
+        page_size: int = 4096,
+    ):
+        self.page_size = page_size
+        self.pages = {}
+
+    def get_page(
+        self,
+        page_number: int,
+    ) -> bytes:
+        if page_number not in self.pages:
+            self.pages[page_number] = self.new_page()
+        return self.pages[page_number]
+
+    def write_page(
+        self,
+        page_number: int,
+        data: bytes,
+    ):
+        self.page[page_number] = data
+
+    def new_page(self) -> bytes:
+        return bytes([0x00] * self.page_size)
