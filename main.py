@@ -1,6 +1,6 @@
 from src.dbinfo import DBInfo
 from src.backend.node import Node
-from src.backend.pager import Pager
+from src.backend.pager import MemoryPager, Pager
 
 def test_dbinfo():
     pager = Pager('test.db')
@@ -48,5 +48,23 @@ def test_file_end_to_end():
 
     print('generated.db written')
 
+def test_memory_pager():
+    old_db_pager = Pager('test.db')
+    new_db_pager = MemoryPager()
+
+    # read in the schema page
+    schema_page = old_db_pager.get_page(1)
+    new_db_pager.write_page(1, schema_page)
+
+    # read in the page with the test table
+    data_page = old_db_pager.get_page(2)
+    new_db_pager.write_page(2, data_page)
+
+    schema_node = Node(new_db_pager.get_page(1), True)
+    data_node = Node(new_db_pager.get_page(2))
+
+    schema_node._debug()
+    data_node._debug()
+
 if __name__ == '__main__':
-    test_file_end_to_end()
+    test_memory_pager()

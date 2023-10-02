@@ -58,7 +58,7 @@ class MemoryPager:
         page_number: int,
         data: bytes,
     ):
-        self.page[page_number] = data
+        self.pages[page_number] = data
 
     def new_page(self) -> bytes:
         return bytes([0x00] * self.page_size)
